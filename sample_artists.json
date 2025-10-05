@@ -1,0 +1,26 @@
+{
+  "sample_artists": [
+    {
+      "id": "artist-001-stellar",
+      "name": "Stellar Waves",
+      "artistName": "Stellar Waves",
+      "bio": "Electronic music duo from Nairobi, Kenya, known for their innovative fusion of traditional African instruments with modern electronic production. Their sound combines deep house rhythms with organic percussion and melodic synthesizers, creating a unique 'Afro-Electronic' genre that has gained international recognition.",
+      "imageUrl": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=500&fit=crop",
+      "genre": "Afro-Electronic",
+      "country": "Kenya",
+      "createdAt": "2023-01-15T09:00:00Z",
+      "updatedAt": "2024-08-20T16:30:00Z"
+    },
+    {
+      "id": "artist-002-rhythm",
+      "name": "Rhythm Collective",
+      "artistName": "Rhythm Collective", 
+      "bio": "A dynamic Afrobeats group consisting of four talented musicians from Lagos, Nigeria. They specialize in high-energy performances that blend traditional Yoruba music with contemporary Afrobeats, creating infectious rhythms that dominate dance floors across Africa. Known for their hit singles and collaborations with top African artists.",
+      "imageUrl": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=500&h=500&fit=crop",
+      "genre": "Afrobeats",
+      "country": "Nigeria", 
+      "createdAt": "2022-11-08T11:45:00Z",
+      "updatedAt": "2024-08-19T14:20:00Z"
+    }
+  ]
+}

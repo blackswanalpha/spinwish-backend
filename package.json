@@ -1,0 +1,22 @@
+{
+  "name": "spinwish-email-tests",
+  "version": "1.0.0",
+  "description": "Email functionality tests for SpinWish application",
+  "main": "test_email_functionality.js",
+  "scripts": {
+    "test": "node test_email_functionality.js",
+    "test-email": "node test_email_functionality.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "keywords": [
+    "spinwish",
+    "email",
+    "testing",
+    "smtp",
+    "verification"
+  ],
+  "author": "SpinWish Team",
+  "license": "MIT"
+}

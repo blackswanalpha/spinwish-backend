@@ -1,0 +1,1155 @@
+{
+	"info": {
+		"_postman_id": "be0ba78c-341d-4a73-a874-130c13492f90",
+		"name": "SpinWish",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28939560"
+	},
+	"item": [
+		{
+			"name": "Roles",
+			"item": [
+				{
+					"name": "Create Roles",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"roleName\": \"DJ\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/roles",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Roles",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/roles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Each Role",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDQ0MjI0LCJleHAiOjE3NTMwNDc4MjR9.g_ATjlXWAZpp7gZA5fSlX72wM3Wouq6ZjmjvQjaHx6U",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/roles/56eb4cd7-3472-4970-ada2-3eb88de643ca",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"roles",
+								"56eb4cd7-3472-4970-ada2-3eb88de643ca"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDQ0MjI0LCJleHAiOjE3NTMwNDc4MjR9.g_ATjlXWAZpp7gZA5fSlX72wM3Wouq6ZjmjvQjaHx6U"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roleName\": \"SUPERADMIN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/roles/56eb4cd7-3472-4970-ada2-3eb88de643ca",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"roles",
+								"56eb4cd7-3472-4970-ada2-3eb88de643ca"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDQ0MjI0LCJleHAiOjE3NTMwNDc4MjR9.g_ATjlXWAZpp7gZA5fSlX72wM3Wouq6ZjmjvQjaHx6U"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/roles/56eb4cd7-3472-4970-ada2-3eb88de643ca",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"roles",
+								"56eb4cd7-3472-4970-ada2-3eb88de643ca"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"djjose\",\n  \"emailAddress\": \"jose@gmail.com\",\n  \"password\": \"securePassword123\",\n  \"roleName\": \"DJ\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/users/signup",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"emailAddress\": \"michael12@gmail.com\",\r\n  \"password\": \"securePassword123\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/users/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDQyODcxLCJleHAiOjE3NTMwNDY0NzF9.rlmREHFPYp04-5uIWqplGyyVCnAwcmq9LtCAT0uW7bU"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "firstName",
+									"value": "Joseph",
+									"type": "text"
+								},
+								{
+									"key": "lastName",
+									"value": "Joestar",
+									"type": "text"
+								},
+								{
+									"key": "phoneNumber",
+									"value": "0712345678",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/ngare/Downloads/lightning-9274136_1280.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDQwODE1LCJleHAiOjE3NTMwNDQ0MTV9.XMZkvHdQ5AsBWLSvT8NqU3_-Tbf85H1dfb20PVwHi90",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDQwODE1LCJleHAiOjE3NTMwNDQ0MTV9.XMZkvHdQ5AsBWLSvT8NqU3_-Tbf85H1dfb20PVwHi90"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Pay Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6ImU4MzlkYjM2LTAxMTktNGMxOS1hODE1LTVhMzIwZTIxNGRkNiIsInN1YiI6Im1pY2hhZWwxMkBnbWFpbC5jb20iLCJpYXQiOjE3NTMxMDg5ODAsImV4cCI6MTc1MzExMjU4MH0.Sv9qmvM1zL8a_f38AAI8575hhhyRTx8ameBNBzqOoAA"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phoneNumber\": \"254792708171\",\n    \"amount\": \"5\",\n    \"requestId\":\"9724f236-f7f4-49ef-a20f-5fc26d501e9c\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/payment/mpesa/stkpush",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payment",
+								"mpesa",
+								"stkpush"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payments",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6ImU4MzlkYjM2LTAxMTktNGMxOS1hODE1LTVhMzIwZTIxNGRkNiIsInN1YiI6Im1pY2hhZWwxMkBnbWFpbC5jb20iLCJpYXQiOjE3NTMxMDg1OTksImV4cCI6MTc1MzExMjE5OX0.AGadW8VckItQ4KDdbJRTLIZ4V9oEvLf6ycpwDjeobKA"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/payment",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tip DJ",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6ImU4MzlkYjM2LTAxMTktNGMxOS1hODE1LTVhMzIwZTIxNGRkNiIsInN1YiI6Im1pY2hhZWwxMkBnbWFpbC5jb20iLCJpYXQiOjE3NTMxMDE1ODQsImV4cCI6MTc1MzEwNTE4NH0.n-ZQoIUsdQuaT4e4YrEfzT59BBTMQiGVKUDCgThzBQY"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phoneNumber\": \"254792708171\",\n    \"amount\": \"2\",\n    \"djName\": \"djjose\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/payment/mpesa/stkpush",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payment",
+								"mpesa",
+								"stkpush"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Callback Test",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Body\": {\n    \"stkCallback\": {\n      \"MerchantRequestID\": \"99191-12345678\",\n      \"CheckoutRequestID\": \"ws_CO_21072025135446543792708171\",\n      \"ResultCode\": 0,\n      \"ResultDesc\": \"The service request is processed successfully.\",\n      \"CallbackMetadata\": {\n        \"Item\": [\n          { \"Name\": \"Amount\", \"Value\": 1.0 },\n          { \"Name\": \"MpesaReceiptNumber\", \"Value\": \"TGL1VXD9E1\" },\n          { \"Name\": \"Balance\" },\n          { \"Name\": \"TransactionDate\", \"Value\": 20250721135457 },\n          { \"Name\": \"PhoneNumber\", \"Value\": 254712345678 }\n        ]\n      }\n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://spinwish.onrender.com/api/v1/payment/callback",
+							"protocol": "https",
+							"host": [
+								"spinwish",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payment",
+								"callback"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "STK Query",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6ImU4MzlkYjM2LTAxMTktNGMxOS1hODE1LTVhMzIwZTIxNGRkNiIsInN1YiI6Im1pY2hhZWwxMkBnbWFpbC5jb20iLCJpYXQiOjE3NTMxMDg1OTksImV4cCI6MTc1MzExMjE5OX0.AGadW8VckItQ4KDdbJRTLIZ4V9oEvLf6ycpwDjeobKA"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/payment/stk/query/ws_CO_21072025174506463792708171",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payment",
+								"stk",
+								"query",
+								"ws_CO_21072025174506463792708171"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Requests",
+			"item": [
+				{
+					"name": "Create Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6ImU4MzlkYjM2LTAxMTktNGMxOS1hODE1LTVhMzIwZTIxNGRkNiIsInN1YiI6Im1pY2hhZWwxMkBnbWFpbC5jb20iLCJpYXQiOjE3NTMwODY0MzcsImV4cCI6MTc1MzA5MDAzN30.Kfd6t6yeDh-Ys1otSyJjukdghv_Gp4HP2fApm1dqjQk"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"djEmailAddress\": \"jose@gmail.com\",\n    \"songIds\": [\"3599cbb2-5f37-4521-b074-261cc5b768bc\", \"ae48d9fa-0a32-4e3f-97c1-41c6652729a0\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/requests",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Requests",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6ImU4MzlkYjM2LTAxMTktNGMxOS1hODE1LTVhMzIwZTIxNGRkNiIsInN1YiI6Im1pY2hhZWwxMkBnbWFpbC5jb20iLCJpYXQiOjE3NTMwODY0MzcsImV4cCI6MTc1MzA5MDAzN30.Kfd6t6yeDh-Ys1otSyJjukdghv_Gp4HP2fApm1dqjQk"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/requests",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Done",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDM4MDcyLCJleHAiOjE3NTMwNDE2NzJ9.uDEhCiHPvJ6LRkM84jiiQ9r7Nv2G_r3FlP6Fegsvfw4"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/requests/61add3dd-d60d-4cb8-a28e-69d406c2ed27/done",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"requests",
+								"61add3dd-d60d-4cb8-a28e-69d406c2ed27",
+								"done"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDM5MjM3LCJleHAiOjE3NTMwNDI4Mzd9.BL-pjZ4lCidO5mFYFdXST8H9_PLw0D2qjULEJ83zZVw"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"djEmailAddress\": \"joe@gmail.com\",\n    \"songIds\": [\"a9681b0a-d625-4171-b56a-e3f050b5b0d3\", \"8475ed0f-c321-493c-a699-e0b521f75ed4\",\"fad29a71-ae4d-4f81-af2f-1acd76c622fa\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/requests/499e3d10-9b90-4ffe-b356-6447dbed9deb",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"requests",
+								"499e3d10-9b90-4ffe-b356-6447dbed9deb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Request",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDM4MDcyLCJleHAiOjE3NTMwNDE2NzJ9.uDEhCiHPvJ6LRkM84jiiQ9r7Nv2G_r3FlP6Fegsvfw4"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/requests/61add3dd-d60d-4cb8-a28e-69d406c2ed27",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"requests",
+								"61add3dd-d60d-4cb8-a28e-69d406c2ed27"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Each Request",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDM5MjM3LCJleHAiOjE3NTMwNDI4Mzd9.BL-pjZ4lCidO5mFYFdXST8H9_PLw0D2qjULEJ83zZVw"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/requests/499e3d10-9b90-4ffe-b356-6447dbed9deb",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"requests",
+								"499e3d10-9b90-4ffe-b356-6447dbed9deb"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Songs",
+			"item": [
+				{
+					"name": "Create Songs",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6ImU4MzlkYjM2LTAxMTktNGMxOS1hODE1LTVhMzIwZTIxNGRkNiIsInN1YiI6Im1pY2hhZWwxMkBnbWFpbC5jb20iLCJpYXQiOjE3NTMwODY0MzcsImV4cCI6MTc1MzA5MDAzN30.Kfd6t6yeDh-Ys1otSyJjukdghv_Gp4HP2fApm1dqjQk"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Love yourself\",\n  \"album\": \"8 Mile\",\n  \"artistId\": \"260a9ee3-f6e0-4679-b93a-8cbb1f1d6d19\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/songs",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"songs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Each Song",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDE4NTczLCJleHAiOjE3NTMwMjIxNzN9.t4-zEZA0t4d_lF-0DawQ60StxfPUsdUQ_SOVp6fVszQ"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/songs/eded44e9-d450-4176-be52-bf3a1fe6ec29",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								"eded44e9-d450-4176-be52-bf3a1fe6ec29"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Songs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDM0Mzc4LCJleHAiOjE3NTMwMzc5Nzh9.noXLQClS-_af97sSd6ijEOT0UXpSV6bwCiRPe9Lrj4U"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/songs",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"songs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Song",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDE4NTczLCJleHAiOjE3NTMwMjIxNzN9.t4-zEZA0t4d_lF-0DawQ60StxfPUsdUQ_SOVp6fVszQ"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Not Like Us\",\n  \"album\": \"Drake Album\",\n  \"artistId\": \"9d36384f-265a-424a-b9d1-7dc293f6a9ab\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/songs/eded44e9-d450-4176-be52-bf3a1fe6ec29",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								"eded44e9-d450-4176-be52-bf3a1fe6ec29"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Song",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDE4NTczLCJleHAiOjE3NTMwMjIxNzN9.t4-zEZA0t4d_lF-0DawQ60StxfPUsdUQ_SOVp6fVszQ"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/songs/eded44e9-d450-4176-be52-bf3a1fe6ec29",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								"eded44e9-d450-4176-be52-bf3a1fe6ec29"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Artists",
+			"item": [
+				{
+					"name": "Create Artist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6ImU4MzlkYjM2LTAxMTktNGMxOS1hODE1LTVhMzIwZTIxNGRkNiIsInN1YiI6Im1pY2hhZWwxMkBnbWFpbC5jb20iLCJpYXQiOjE3NTMwODY0MzcsImV4cCI6MTc1MzA5MDAzN30.Kfd6t6yeDh-Ys1otSyJjukdghv_Gp4HP2fApm1dqjQk"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "John",
+									"type": "text"
+								},
+								{
+									"key": "bio",
+									"value": "Canadian rapper and singer",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/ngare/Downloads/lightning-9274136_1280.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/artists",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"artists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Artists",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6Ijc5ZmM3NmNlLTIyMTYtNGFkMS04MzBlLWVjMmZmMTcxYTBjOCIsInN1YiI6Im1pY2hhZWwxMkBnbWFpbC5jb20iLCJpYXQiOjE3NTMwMjIwODEsImV4cCI6MTc1MzAyNTY4MX0.lqmb69_R6e3FRZJRA_H5MffgH-600oUfaiZwzEO2GoQ"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/artists",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"artists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Each Artist",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDE4NTczLCJleHAiOjE3NTMwMjIxNzN9.t4-zEZA0t4d_lF-0DawQ60StxfPUsdUQ_SOVp6fVszQ"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/artists/ae7b4c2a-642d-4307-9d62-bc0ba8cf8e0b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"ae7b4c2a-642d-4307-9d62-bc0ba8cf8e0b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Artist",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDE4NTczLCJleHAiOjE3NTMwMjIxNzN9.t4-zEZA0t4d_lF-0DawQ60StxfPUsdUQ_SOVp6fVszQ"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/artists/ae7b4c2a-642d-4307-9d62-bc0ba8cf8e0b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"ae7b4c2a-642d-4307-9d62-bc0ba8cf8e0b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Artist",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0NMSUVOVCJdLCJpZCI6IjkxOTBkNDMzLTk1YTEtNDIzYS04MDQ0LWE1NjEzNzVhZmE5YSIsInN1YiI6Im1pY2hhZWxAZ21haWwuY29tIiwiaWF0IjoxNzUzMDE4NTczLCJleHAiOjE3NTMwMjIxNzN9.t4-zEZA0t4d_lF-0DawQ60StxfPUsdUQ_SOVp6fVszQ"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Drake",
+									"type": "text"
+								},
+								{
+									"key": "bio",
+									"value": "Updated Drake",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/ngare/Downloads/wildlife-9653769_1920.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/artists/ae7b4c2a-642d-4307-9d62-bc0ba8cf8e0b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"ae7b4c2a-642d-4307-9d62-bc0ba8cf8e0b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "https://spinwish.onrender.com",
+			"type": "default"
+		}
+	]
+}

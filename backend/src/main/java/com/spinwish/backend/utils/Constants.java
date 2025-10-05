@@ -1,0 +1,9 @@
+package com.spinwish.backend.utils;
+
+import java.nio.charset.StandardCharsets;
+
+public class Constants {
+    public static final String SIGNING_KEY="e4f228a4389dd3ee602df0680e1a757f067c96f54a18b45c51a1cd684d50209ba6ad084e374ae09361321f7e6cbb41469db8a345f8e1407f68613044b66ad779b364a1231ea901de8f76d49214e9a362ff127314875aafda58aa210df22beb1adb655e5769c5c19c14bdeafbb68c76d40d1b9cf0ff5fc9bc30fd6471aaff0bb6c3221a0186d6b9ecb6227897f2f13afb5b75ba993801d55722ba61875630ab85b4641673415be41fa5cff6c03741445b412d4dcf036414b88781415c792384c174d6e27e8cd897c267fc32d138d402f424c0a67ea1443c55f94cff8be8cff9508adc056fa8f0b083309986237d44859845bd5a1aa3462ee5126bf7cf7018a99b";
+    public static final long JWT_TOKEN_VALIDITY_MS=60 * 60 * 1000;
+    public static final byte[] SIGNING_KEY_BYTES = SIGNING_KEY.getBytes(StandardCharsets.UTF_8);
+}

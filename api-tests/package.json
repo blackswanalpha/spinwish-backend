@@ -1,0 +1,17 @@
+{
+  "name": "api-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:enhanced": "npx playwright test enhanced-workflow.spec.js",
+    "test:business": "npx playwright test business-workflow.spec.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@playwright/test": "^1.54.2"
+  }
+}

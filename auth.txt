@@ -1,0 +1,13 @@
+# SpinWish Sample DJ Credentials
+# Format: username:email:password:role
+
+# DJ 1 - Electronic/House Music Specialist
+dj_nexus:dj.nexus@spinwish.com:SecurePass123!:DJ
+
+# DJ 2 - Hip-Hop/Afrobeats Specialist  
+dj_vibe_master:dj.vibemaster@spinwish.com:VibeMaster456#:DJ
+
+# Additional Info:
+# - All DJs have verified email and phone status
+# - Passwords meet security requirements (8+ chars, uppercase, lowercase, number, special char)
+# - These are sample accounts for development/testing purposes only

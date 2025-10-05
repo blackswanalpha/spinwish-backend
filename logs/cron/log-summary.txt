@@ -1,0 +1,10 @@
+=== SpinWish Log Summary - 2025-08-21 22:14:20 ===
+
+Log Directory Disk Usage:
+12K	logs/cron
+
+Log Files:
+-rw-rw-r-- 1 mbugua mbugua 153 Aug 21 22:14 logs/cron/server-manager.log
+
+Recent Errors (last 24 hours):
+Recent Server Restarts (last 24 hours):
