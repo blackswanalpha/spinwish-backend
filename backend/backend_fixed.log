@@ -13731,7 +13731,7 @@ Hibernate:
         u1_0.phone_number=?
 2025-10-02 16:16:36.787 DEBUG 179686 [0.0-8080-exec-1] org.hibernate.orm.results                [] : Initializer list:
 	  com.spinwish.backend.entities.Users(4).role -> EntitySelectFetchInitializer(com.spinwish.backend.entities.Users(4).role)@1215058073 (ToOneAttributeMapping(NavigableRole[com.spinwish.backend.entities.Users.role])@1321688181)
-	  com.spinwish.backend.entities.Users(4) -> EntityJoinedFetchInitializer(com.spinwish.backend.entities.Users(4))@590905707 (SingleTableEntityPersister(com.spinwish.backend.entities.Users))
+	  com.spinwish.backend.entities.Users(4) -> EntityJoinedFetchInitializer(com.spinwish.backend.entities.Users(4))@580805707 (SingleTableEntityPersister(com.spinwish.backend.entities.Users))
 	  com.spinwish.backend.entities.Users(4).genres -> DelayedCollectionInitializer(com.spinwish.backend.entities.Users(4).genres)@1319819203 (PluralAttribute(com.spinwish.backend.entities.Users.genres))
 
 2025-10-02 16:16:36.792 DEBUG 179686 [0.0-8080-exec-1] org.hibernate.orm.sql.ast.create         [] : Created new SQL alias : r1_0
