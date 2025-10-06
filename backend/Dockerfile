@@ -3,13 +3,17 @@ FROM maven:latest AS build
 
 WORKDIR /app
 
-COPY . .
+# Copy pom.xml first to leverage Docker layer caching
+COPY backend/pom.xml .
 
+# Download dependencies (this layer will be cached if pom.xml doesn't change)
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY backend/src ./src
+
+# Build the application
 RUN mvn clean package -DskipTests
-
-COPY ./pom.xml /app/pom.xml
-
-COPY ./src /app/src
 
 # Stage 2: Run the .jar
 FROM openjdk:21-jdk-slim
