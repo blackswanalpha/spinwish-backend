@@ -10,6 +10,7 @@ import 'package:spinwishapp/widgets/session_history_preview.dart';
 import 'package:spinwishapp/widgets/session_sharing_widget.dart';
 import 'package:spinwishapp/screens/dj/create_session_screen.dart';
 import 'package:spinwishapp/screens/dj/location_settings_screen.dart';
+import 'package:spinwishapp/screens/dj/live_session_screen.dart';
 
 class SessionTab extends StatefulWidget {
   const SessionTab({super.key});
@@ -629,15 +630,33 @@ class _SessionTabState extends State<SessionTab> {
 
     final sessionService = Provider.of<SessionService>(context, listen: false);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
 
     try {
-      await sessionService.startSession(
+      final session = await sessionService.startSession(
         djId: currentDJ!.id,
         type: session_model.SessionType.online,
         title: '${currentDJ!.name} - Online Session',
         description: 'Live streaming session by ${currentDJ!.name}',
-        genres: currentDJ!.genres.isNotEmpty ? currentDJ!.genres : ['Electronic'],
+        genres:
+            currentDJ!.genres.isNotEmpty ? currentDJ!.genres : ['Electronic'],
       );
+
+      // Navigate to LiveSessionScreen after successful session creation
+      if (mounted) {
+        navigator.push(
+          MaterialPageRoute(
+            builder: (context) => LiveSessionScreen(session: session),
+          ),
+        );
+
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text('Online session started successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } catch (e) {
       if (mounted) {
         scaffoldMessenger.showSnackBar(

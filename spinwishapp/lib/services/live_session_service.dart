@@ -194,6 +194,9 @@ class LiveSessionService extends ChangeNotifier {
               isAcceptingRequests: session.isAcceptingRequests ?? true,
               minTipAmount: 5.0, // Default minimum tip amount
               genres: session.genres ?? [],
+              shareableLink: session.shareableLink,
+              imageUrl: session.imageUrl,
+              thumbnailUrl: session.thumbnailUrl,
             );
             _liveSessions.add(djSession);
           }

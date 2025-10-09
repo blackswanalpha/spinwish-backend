@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spinwishapp/screens/dj/earnings/transaction_screen.dart';
 import 'package:spinwishapp/screens/dj/earnings/payout_settings_screen.dart';
 import 'package:spinwishapp/screens/dj/earnings/tips_analysis_screen.dart';
+import 'package:spinwishapp/screens/dj/earnings/request_payout_dialog.dart';
 import 'package:spinwishapp/screens/dj/request_payments_screen.dart';
 import 'package:spinwishapp/services/dj_api_service.dart';
 import 'package:spinwishapp/services/earnings_api_service.dart';
@@ -92,8 +93,9 @@ class _EarningsTabState extends State<EarningsTab> {
             onSelected: (value) {
               setState(() {
                 selectedPeriod = value;
-                // TODO: Reload data for selected period
               });
+              // Reload data for selected period
+              _loadEarningsData();
             },
             itemBuilder: (context) => periods
                 .map(
@@ -691,41 +693,18 @@ class _EarningsTabState extends State<EarningsTab> {
     );
   }
 
-  void _showPayoutDialog(ThemeData theme) {
-    showDialog(
+  Future<void> _showPayoutDialog(ThemeData theme) async {
+    final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Request Payout'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-                'Amount: KSH ${earningsSummary?.availableForPayout.toStringAsFixed(2) ?? "0.00"}'),
-            const SizedBox(height: 8),
-            const Text(
-              'This will be transferred to your default payment method.',
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Process payout request
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Payout request submitted')),
-              );
-            },
-            child: const Text('Confirm'),
-          ),
-        ],
+      builder: (context) => RequestPayoutDialog(
+        availableAmount: earningsSummary?.availableForPayout ?? 0.0,
       ),
     );
+
+    // Reload earnings data if payout was successful
+    if (result == true) {
+      _loadEarningsData();
+    }
   }
 
   Widget _buildErrorState(ThemeData theme) {

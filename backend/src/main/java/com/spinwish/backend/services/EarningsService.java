@@ -1,5 +1,6 @@
 package com.spinwish.backend.services;
 
+import com.spinwish.backend.entities.Request;
 import com.spinwish.backend.entities.Users;
 import com.spinwish.backend.entities.payments.TipPayments;
 import com.spinwish.backend.entities.payments.RequestsPayment;
@@ -42,25 +43,35 @@ public class EarningsService {
         LocalDateTime startDate = getStartDateForPeriod(period);
         LocalDateTime endDate = LocalDateTime.now();
 
-        // Get tip earnings
+        // Get tip earnings (all tips are immediately available)
         List<TipPayments> tips = tipPaymentsRepository.findByDjAndTransactionDateBetween(
                 dj, startDate, endDate);
         double totalTips = tips.stream().mapToDouble(TipPayments::getAmount).sum();
 
-        // Get request earnings
-        List<RequestsPayment> requests = requestsPaymentRepository.findByRequestDjAndTransactionDateBetween(
-                dj, startDate, endDate);
-        double totalRequests = requests.stream().mapToDouble(RequestsPayment::getAmount).sum();
+        // Get ACCEPTED request earnings only (not pending or rejected)
+        List<RequestsPayment> acceptedRequests = requestsPaymentRepository
+                .findByRequestDjAndStatusAndTransactionDateBetween(
+                        dj, Request.RequestStatus.ACCEPTED, startDate, endDate);
+        double totalAcceptedRequests = acceptedRequests.stream()
+                .mapToDouble(RequestsPayment::getAmount).sum();
 
-        double totalEarnings = totalTips + totalRequests;
+        // Get PENDING request payments (not yet approved)
+        List<RequestsPayment> pendingRequests = requestsPaymentRepository
+                .findByRequestDjAndStatusAndTransactionDateBetween(
+                        dj, Request.RequestStatus.PENDING, startDate, endDate);
+        double totalPendingRequests = pendingRequests.stream()
+                .mapToDouble(RequestsPayment::getAmount).sum();
+
+        // Total earnings = tips + accepted requests only
+        double totalEarnings = totalTips + totalAcceptedRequests;
 
         return new EarningsSummary(
                 totalEarnings,
                 totalTips,
-                totalRequests,
-                0.0, // pendingAmount - TODO: implement payout logic
-                totalEarnings, // availableForPayout - TODO: implement payout logic
-                tips.size() + requests.size(),
+                totalAcceptedRequests,
+                totalPendingRequests, // Pending amount from unapproved requests
+                totalEarnings, // Available for payout (all accepted earnings)
+                tips.size() + acceptedRequests.size(),
                 startDate,
                 endDate
         );

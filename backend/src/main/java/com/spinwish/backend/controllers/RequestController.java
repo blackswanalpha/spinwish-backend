@@ -273,6 +273,30 @@ public class RequestController {
         }
     }
 
+    @Operation(
+            summary = "Get pending requests for a session",
+            description = "Get all pending song requests for a specific session (DJ only)",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pending requests retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token required")
+    })
+    @GetMapping("/session/{sessionId}/pending")
+    public ResponseEntity<?> getPendingRequestsForSession(
+            @Parameter(description = "Session ID", required = true)
+            @PathVariable UUID sessionId) {
+        try {
+            List<PlaySongResponse> requests = requestsService.getPendingRequestsBySessionId(sessionId);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to get pending requests: " + e.getMessage());
+        }
+    }
+
+
+
     // ===== ENHANCED QUEUE MANAGEMENT ENDPOINTS =====
 
     @Operation(

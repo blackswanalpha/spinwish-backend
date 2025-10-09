@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:spinwishapp/models/session.dart';
 import 'package:spinwishapp/models/dj.dart';
@@ -7,6 +8,7 @@ import 'package:spinwishapp/models/request.dart';
 import 'package:spinwishapp/services/song_api_service.dart';
 import 'package:spinwishapp/services/user_requests_service.dart'
     as request_service;
+import 'package:spinwishapp/services/websocket_service.dart';
 import 'package:spinwishapp/screens/requests/song_request_screen.dart';
 import 'package:spinwishapp/screens/tips/tip_dj_screen.dart';
 
@@ -39,6 +41,11 @@ class _SessionDetailScreenState extends State<SessionDetailScreen>
   Map<String, Song> songCache = {}; // Cache for efficient song lookup
   bool isLoading = true;
 
+  // WebSocket integration
+  final WebSocketService _webSocketService = WebSocketService();
+  StreamSubscription<Request>? _requestUpdateSubscription;
+  StreamSubscription<Session>? _sessionUpdateSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -48,17 +55,155 @@ class _SessionDetailScreenState extends State<SessionDetailScreen>
       initialIndex: widget.initialTabIndex,
     );
     _loadSessionData();
+    _initializeWebSocket();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _cleanupWebSocket();
     super.dispose();
   }
 
   // Refresh data when returning to this screen
   void _refreshData() {
     _loadSessionData();
+  }
+
+  /// Initialize WebSocket connection and subscribe to updates
+  Future<void> _initializeWebSocket() async {
+    try {
+      // Connect to WebSocket if not already connected
+      if (!_webSocketService.isConnected) {
+        await _webSocketService.connect();
+      }
+
+      // Subscribe to session updates
+      _webSocketService.subscribeToSession(widget.session.id);
+
+      // Listen for request updates
+      _requestUpdateSubscription = _webSocketService.requestUpdates.listen(
+        (updatedRequest) {
+          _handleRequestUpdate(updatedRequest);
+        },
+        onError: (error) {
+          debugPrint('Error receiving request update: $error');
+        },
+      );
+
+      // Listen for session updates
+      _sessionUpdateSubscription = _webSocketService.sessionUpdates.listen(
+        (updatedSession) {
+          _handleSessionUpdate(updatedSession);
+        },
+        onError: (error) {
+          debugPrint('Error receiving session update: $error');
+        },
+      );
+
+      debugPrint('✅ WebSocket initialized for session ${widget.session.id}');
+    } catch (e) {
+      debugPrint('❌ Failed to initialize WebSocket: $e');
+    }
+  }
+
+  /// Cleanup WebSocket subscriptions
+  void _cleanupWebSocket() {
+    _requestUpdateSubscription?.cancel();
+    _sessionUpdateSubscription?.cancel();
+    _webSocketService.unsubscribeFromSession(widget.session.id);
+    debugPrint('🧹 WebSocket cleaned up for session ${widget.session.id}');
+  }
+
+  /// Handle real-time request updates from WebSocket
+  void _handleRequestUpdate(Request updatedRequest) {
+    if (!mounted) return;
+
+    // Only process updates for this session
+    if (updatedRequest.sessionId != widget.session.id) return;
+
+    setState(() {
+      // Find and update the request in the list
+      final index = recentRequests.indexWhere((r) => r.id == updatedRequest.id);
+
+      if (index != -1) {
+        // Update existing request
+        recentRequests[index] = updatedRequest;
+
+        // Show notification based on status change
+        if (updatedRequest.status == RequestStatus.accepted) {
+          _showStatusNotification('✅ Your request was accepted!', Colors.green);
+
+          // Reload queue to reflect the accepted request
+          _loadSessionData();
+        } else if (updatedRequest.status == RequestStatus.rejected) {
+          _showStatusNotification('❌ Your request was declined', Colors.red);
+        }
+      } else {
+        // Add new request if not found
+        recentRequests.insert(0, updatedRequest);
+      }
+    });
+
+    debugPrint(
+        '🔄 Request updated: ${updatedRequest.id} - ${updatedRequest.status}');
+  }
+
+  /// Handle real-time session updates from WebSocket
+  void _handleSessionUpdate(Session updatedSession) {
+    if (!mounted) return;
+
+    // Only process updates for this session
+    if (updatedSession.id != widget.session.id) return;
+
+    setState(() {
+      // Update current song if changed
+      if (updatedSession.currentSongId != null &&
+          updatedSession.currentSongId != currentSong?.id) {
+        final newSong = songCache[updatedSession.currentSongId];
+        if (newSong != null) {
+          currentSong = newSong;
+          _showStatusNotification(
+              '🎵 Now playing: ${newSong.title}', Colors.blue);
+        }
+      }
+    });
+
+    debugPrint('🔄 Session updated: ${updatedSession.id}');
+  }
+
+  /// Show a status notification to the user
+  void _showStatusNotification(String message, Color backgroundColor) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Expanded(child: Text(message)),
+            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+          ],
+        ),
+        backgroundColor: backgroundColor,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  /// Show full-screen image viewer
+  void _showImageViewer(String imageUrl) {
+    if (!mounted) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => _ImageViewerScreen(imageUrl: imageUrl),
+      ),
+    );
   }
 
   Future<void> _loadSessionData() async {
@@ -206,27 +351,53 @@ class _SessionDetailScreenState extends State<SessionDetailScreen>
         background: Stack(
           fit: StackFit.expand,
           children: [
-            widget.club.imageUrl.isNotEmpty
-                ? Image.network(
-                    widget.club.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: theme.colorScheme.primaryContainer,
-                      child: Icon(
-                        Icons.nightlife,
-                        size: 80,
-                        color: theme.colorScheme.onPrimaryContainer,
+            // Make image tappable to view in full screen
+            GestureDetector(
+              onTap: () {
+                if (widget.club.imageUrl.isNotEmpty) {
+                  _showImageViewer(widget.club.imageUrl);
+                } else if (widget.session.imageUrl != null &&
+                    widget.session.imageUrl!.isNotEmpty) {
+                  _showImageViewer(widget.session.imageUrl!);
+                }
+              },
+              child: widget.club.imageUrl.isNotEmpty
+                  ? Image.network(
+                      widget.club.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: theme.colorScheme.primaryContainer,
+                        child: Icon(
+                          Icons.nightlife,
+                          size: 80,
+                          color: theme.colorScheme.onPrimaryContainer,
+                        ),
                       ),
-                    ),
-                  )
-                : Container(
-                    color: theme.colorScheme.primaryContainer,
-                    child: Icon(
-                      Icons.nightlife,
-                      size: 80,
-                      color: theme.colorScheme.onPrimaryContainer,
-                    ),
-                  ),
+                    )
+                  : widget.session.imageUrl != null &&
+                          widget.session.imageUrl!.isNotEmpty
+                      ? Image.network(
+                          widget.session.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                            color: theme.colorScheme.primaryContainer,
+                            child: Icon(
+                              Icons.nightlife,
+                              size: 80,
+                              color: theme.colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        )
+                      : Container(
+                          color: theme.colorScheme.primaryContainer,
+                          child: Icon(
+                            Icons.nightlife,
+                            size: 80,
+                            color: theme.colorScheme.onPrimaryContainer,
+                          ),
+                        ),
+            ),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -931,6 +1102,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen>
     );
   }
 
+  // Helper methods
   Color _getStatusColor(ThemeData theme, RequestStatus status) {
     switch (status) {
       case RequestStatus.pending:
@@ -966,5 +1138,123 @@ class _SessionDetailScreenState extends State<SessionDetailScreen>
     } else {
       return '${difference.inMinutes}m ago';
     }
+  }
+}
+
+/// Full-screen image viewer with pinch-to-zoom and pan gestures
+class _ImageViewerScreen extends StatefulWidget {
+  final String imageUrl;
+
+  const _ImageViewerScreen({required this.imageUrl});
+
+  @override
+  State<_ImageViewerScreen> createState() => _ImageViewerScreenState();
+}
+
+class _ImageViewerScreenState extends State<_ImageViewerScreen> {
+  final TransformationController _transformationController =
+      TransformationController();
+  TapDownDetails? _doubleTapDetails;
+
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    super.dispose();
+  }
+
+  void _handleDoubleTapDown(TapDownDetails details) {
+    _doubleTapDetails = details;
+  }
+
+  void _handleDoubleTap() {
+    if (_transformationController.value != Matrix4.identity()) {
+      // Reset zoom
+      _transformationController.value = Matrix4.identity();
+    } else {
+      // Zoom in to 2x at tap position
+      final position = _doubleTapDetails!.localPosition;
+      _transformationController.value = Matrix4.identity()
+        ..translate(-position.dx, -position.dy)
+        ..scale(2.0);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.zoom_in, color: Colors.white),
+            onPressed: () {
+              final currentScale =
+                  _transformationController.value.getMaxScaleOnAxis();
+              if (currentScale < 3.0) {
+                _transformationController.value = Matrix4.identity()
+                  ..scale(currentScale + 0.5);
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.zoom_out, color: Colors.white),
+            onPressed: () {
+              final currentScale =
+                  _transformationController.value.getMaxScaleOnAxis();
+              if (currentScale > 1.0) {
+                _transformationController.value = Matrix4.identity()
+                  ..scale(currentScale - 0.5);
+              }
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: GestureDetector(
+          onDoubleTapDown: _handleDoubleTapDown,
+          onDoubleTap: _handleDoubleTap,
+          child: InteractiveViewer(
+            transformationController: _transformationController,
+            minScale: 0.5,
+            maxScale: 4.0,
+            child: Image.network(
+              widget.imageUrl,
+              fit: BoxFit.contain,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                    color: Colors.white,
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) => const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.white, size: 64),
+                    SizedBox(height: 16),
+                    Text(
+                      'Failed to load image',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

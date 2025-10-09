@@ -63,7 +63,7 @@ class _PaymePaymentScreenState extends State<PaymePaymentScreen> {
         pin: _pinController.text.trim(),
         amount: widget.amount,
         requestId: widget.metadata?['requestId'],
-        djName: widget.metadata?['djName'],
+        djId: widget.metadata?['djId'],
       );
 
       if (response.isSuccess) {
@@ -108,7 +108,8 @@ class _PaymePaymentScreenState extends State<PaymePaymentScreen> {
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = response.message ?? 'Payment failed. Please try again.';
+          _errorMessage =
+              response.message ?? 'Payment failed. Please try again.';
         });
       }
     } catch (e) {
@@ -397,4 +398,3 @@ class _PaymePaymentScreenState extends State<PaymePaymentScreen> {
     );
   }
 }
-

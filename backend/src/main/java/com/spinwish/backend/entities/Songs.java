@@ -43,6 +43,9 @@ public class Songs {
     @Column(name = "is_explicit")
     private Boolean isExplicit;
 
+    @Column(name = "spotify_url")
+    private String spotifyUrl;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

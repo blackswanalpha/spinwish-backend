@@ -91,30 +91,29 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen>
   }
 
   void _returnToApp() async {
-    // For song request payments, navigate to session detail screen
+    // For song request payments, navigate back to session detail screen
     if (widget.payment.type == PaymentType.songRequest &&
         widget.payment.sessionId != null &&
         widget.payment.sessionId!.isNotEmpty) {
       try {
         if (mounted) {
-          // Pop back through the navigation stack to SessionDetailScreen
-          // Stack: SessionDetailScreen -> SongRequestScreen -> PaymentScreen -> PaymentSuccessScreen
-          // We need to pop 3 times to get back to SessionDetailScreen
-          int popCount = 0;
+          // Navigation stack: SessionDetailScreen -> SongRequestScreen -> PaymentScreen -> PaymentSuccessScreen
+          // We need to pop back to SessionDetailScreen (3 screens back)
+
+          // Pop all the way back to SessionDetailScreen with result=true to trigger refresh
           Navigator.of(context).popUntil((route) {
-            popCount++;
-            // Pop until we've gone back 3 screens or hit the first route
-            return popCount >= 3 || route.isFirst;
+            // Check if this is the SessionDetailScreen by checking route settings
+            // If we can't determine, stop at the first route to prevent over-popping
+            return route.isFirst ||
+                route.settings.name == '/session-detail' ||
+                route.settings.name == '/';
           });
 
-          // Trigger refresh by popping with result=true
-          if (mounted) {
-            Navigator.of(context).pop(true);
-          }
+          debugPrint('✅ Navigated back to session detail after payment');
         }
       } catch (e) {
-        // If fetching session fails, show error and pop back
-        debugPrint('Error navigating to session: $e');
+        // If navigation fails, show error and pop back safely
+        debugPrint('❌ Error navigating to session: $e');
         debugPrint('Session ID: ${widget.payment.sessionId}');
         debugPrint('Payment ID: ${widget.payment.id}');
 
@@ -124,9 +123,20 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen>
           Navigator.of(context).pop(true);
         }
       }
+    } else if (widget.payment.type == PaymentType.tip) {
+      // For tips, pop back to the previous screen (likely session or DJ profile)
+      if (mounted) {
+        // Pop back 2 screens: PaymentSuccessScreen -> PaymentScreen -> TipScreen
+        Navigator.of(context).popUntil((route) {
+          return route.isFirst || route.settings.name == '/session-detail';
+        });
+        debugPrint('✅ Navigated back after tip payment');
+      }
     } else {
       // For other payment types, just pop back
-      Navigator.of(context).pop(true);
+      if (mounted) {
+        Navigator.of(context).pop(true);
+      }
     }
   }
 

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:spinwishapp/models/payment.dart';
-import 'package:spinwishapp/models/play_song_response.dart';
 import 'package:spinwishapp/services/payment_service.dart';
 import 'package:spinwishapp/services/user_requests_service.dart';
 import 'package:spinwishapp/services/auth_service.dart';

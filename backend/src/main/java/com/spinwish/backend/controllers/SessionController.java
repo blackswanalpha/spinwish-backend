@@ -1,6 +1,7 @@
 package com.spinwish.backend.controllers;
 
 import com.spinwish.backend.entities.Session;
+import com.spinwish.backend.models.responses.sessions.SessionAnalyticsResponse;
 import com.spinwish.backend.services.SessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import jakarta.transaction.Transactional;
 @RestController
 @RequestMapping(path = "api/v1/sessions")
 @Tag(name = "Session Management", description = "APIs for managing DJ sessions")
+@Slf4j
 public class SessionController {
 
     @Autowired
@@ -418,15 +421,49 @@ public class SessionController {
             @PathVariable UUID sessionId,
             @Parameter(description = "Image file to upload", required = true)
             @RequestParam("image") MultipartFile imageFile) {
+
+        log.info("Received image upload request for session: {}", sessionId);
+
+        // Validate that file is not empty
+        if (imageFile == null || imageFile.isEmpty()) {
+            log.error("Image file is null or empty");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Image file is required"));
+        }
+
+        log.debug("Image file details - Name: {}, Size: {} bytes, Content-Type: {}",
+                imageFile.getOriginalFilename(),
+                imageFile.getSize(),
+                imageFile.getContentType());
+
         try {
             Session session = sessionService.uploadSessionImage(sessionId, imageFile);
+            log.info("Successfully uploaded image for session: {}", sessionId);
             return new ResponseEntity<>(sessionToMap(session), HttpStatus.OK);
         } catch (IOException e) {
+            log.error("IO error while uploading image for session {}: {}", sessionId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to upload image: " + e.getMessage());
+                    .body(Map.of(
+                            "error", "Failed to upload image",
+                            "message", e.getMessage(),
+                            "sessionId", sessionId.toString()
+                    ));
         } catch (RuntimeException e) {
+            log.error("Runtime error while uploading image for session {}: {}", sessionId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to upload image: " + e.getMessage());
+                    .body(Map.of(
+                            "error", "Failed to upload image",
+                            "message", e.getMessage(),
+                            "sessionId", sessionId.toString()
+                    ));
+        } catch (Exception e) {
+            log.error("Unexpected error while uploading image for session {}: {}", sessionId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "error", "Unexpected error occurred",
+                            "message", e.getMessage(),
+                            "sessionId", sessionId.toString()
+                    ));
         }
     }
 
@@ -461,6 +498,39 @@ public class SessionController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Failed to delete image: " + e.getMessage());
+        }
+    }
+
+    @Operation(
+            summary = "Get session analytics",
+            description = "Get comprehensive analytics for a specific session including earnings, requests, and performance metrics",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Analytics retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = SessionAnalyticsResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Session not found"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - JWT token required"
+            )
+    })
+    @GetMapping("/{sessionId}/analytics")
+    public ResponseEntity<?> getSessionAnalytics(
+            @Parameter(description = "Session ID", required = true)
+            @PathVariable UUID sessionId) {
+        try {
+            SessionAnalyticsResponse analytics = sessionService.getSessionAnalytics(sessionId);
+            return ResponseEntity.ok(analytics);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Failed to get analytics: " + e.getMessage());
         }
     }
 }

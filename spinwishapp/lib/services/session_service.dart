@@ -9,6 +9,8 @@ import 'package:spinwishapp/services/session_api_service.dart';
 import 'package:spinwishapp/services/auth_service.dart';
 import 'package:spinwishapp/services/websocket_service.dart';
 import 'package:spinwishapp/services/enhanced_queue_service.dart';
+import 'package:spinwishapp/services/user_requests_service.dart'
+    as UserRequests;
 import 'package:uuid/uuid.dart';
 
 class SessionService extends ChangeNotifier {
@@ -163,33 +165,38 @@ class SessionService extends ChangeNotifier {
 
     final request = _requestQueue[requestIndex];
 
-    // Simulate API call delay
-    await Future.delayed(const Duration(milliseconds: 300));
+    try {
+      // Call backend API to accept request
+      await UserRequests.UserRequestsService.acceptRequest(requestId);
 
-    // Update request status
-    _requestQueue[requestIndex] = Request(
-      id: request.id,
-      userId: request.userId,
-      sessionId: request.sessionId,
-      songId: request.songId,
-      status: RequestStatus.accepted,
-      amount: request.amount,
-      timestamp: request.timestamp,
-      message: request.message,
-    );
-
-    // Add to earnings
-    _sessionEarnings += request.amount;
-
-    // Update session stats
-    if (_currentSession != null) {
-      _currentSession = _currentSession!.copyWith(
-        totalEarnings: _sessionEarnings,
-        acceptedRequests: (_currentSession!.acceptedRequests ?? 0) + 1,
+      // Update request status locally
+      _requestQueue[requestIndex] = Request(
+        id: request.id,
+        userId: request.userId,
+        sessionId: request.sessionId,
+        songId: request.songId,
+        status: RequestStatus.accepted,
+        amount: request.amount,
+        timestamp: request.timestamp,
+        message: request.message,
       );
-    }
 
-    notifyListeners();
+      // Add to earnings (payment is captured on approval)
+      _sessionEarnings += request.amount;
+
+      // Update session stats
+      if (_currentSession != null) {
+        _currentSession = _currentSession!.copyWith(
+          totalEarnings: _sessionEarnings,
+          acceptedRequests: (_currentSession!.acceptedRequests ?? 0) + 1,
+        );
+      }
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error accepting request: $e');
+      rethrow;
+    }
   }
 
   // Reject a song request
@@ -199,31 +206,38 @@ class SessionService extends ChangeNotifier {
 
     final request = _requestQueue[requestIndex];
 
-    // Simulate API call delay
-    await Future.delayed(const Duration(milliseconds: 300));
+    try {
+      // Call backend API to reject request (automatic refund is processed on backend)
+      await UserRequests.UserRequestsService.rejectRequest(requestId);
 
-    // Update request status
-    _requestQueue[requestIndex] = Request(
-      id: request.id,
-      userId: request.userId,
-      sessionId: request.sessionId,
-      songId: request.songId,
-      status: RequestStatus.rejected,
-      amount: request.amount,
-      timestamp: request.timestamp,
-      message: request.message,
-    );
-
-    // Update session stats
-    if (_currentSession != null) {
-      _currentSession = _currentSession!.copyWith(
-        rejectedRequests: (_currentSession!.rejectedRequests ?? 0) + 1,
+      // Update request status locally
+      _requestQueue[requestIndex] = Request(
+        id: request.id,
+        userId: request.userId,
+        sessionId: request.sessionId,
+        songId: request.songId,
+        status: RequestStatus.rejected,
+        amount: request.amount,
+        timestamp: request.timestamp,
+        message: request.message,
       );
+
+      // Update session stats
+      if (_currentSession != null) {
+        _currentSession = _currentSession!.copyWith(
+          rejectedRequests: (_currentSession!.rejectedRequests ?? 0) + 1,
+        );
+      }
+
+      // Refund is automatically processed on the backend
+      debugPrint(
+          'Request rejected. Automatic refund initiated for amount: \$${request.amount}');
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error rejecting request: $e');
+      rethrow;
     }
-
-    // TODO: Process automatic refund here
-
-    notifyListeners();
   }
 
   // Fulfill a request (mark as played)

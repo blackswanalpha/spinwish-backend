@@ -14,7 +14,7 @@ class SessionDetailScreen extends StatefulWidget {
 
 class _SessionDetailScreenState extends State<SessionDetailScreen> {
   final _messageController = TextEditingController();
-  double _tipAmount = 5.0;
+  double _tipAmount = 50.0;
 
   @override
   void dispose() {
@@ -49,14 +49,22 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Session Image (if available)
+            if (widget.session.imageUrl != null &&
+                widget.session.imageUrl!.isNotEmpty)
+              _buildSessionImage(theme),
+            if (widget.session.imageUrl != null &&
+                widget.session.imageUrl!.isNotEmpty)
+              const SizedBox(height: 16),
+
             // Session Info
             _buildSessionInfo(theme),
             const SizedBox(height: 24),
-            
+
             // Request Song Section
             _buildRequestSection(theme),
             const SizedBox(height: 24),
-            
+
             // Session Stats
             _buildSessionStats(theme),
           ],
@@ -90,7 +98,8 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.green,
                   borderRadius: BorderRadius.circular(20),
@@ -119,7 +128,8 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
               ),
               const Spacer(),
               Text(
-                _formatDuration(DateTime.now().difference(widget.session.startTime)),
+                _formatDuration(
+                    DateTime.now().difference(widget.session.startTime)),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -159,13 +169,17 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
               ),
               const SizedBox(width: 24),
               Icon(
-                widget.session.type == SessionType.club ? Icons.location_on : Icons.wifi,
+                widget.session.type == SessionType.club
+                    ? Icons.location_on
+                    : Icons.wifi,
                 color: theme.colorScheme.primary,
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
-                widget.session.type == SessionType.club ? 'Club Session' : 'Online Session',
+                widget.session.type == SessionType.club
+                    ? 'Club Session'
+                    : 'Online Session',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -179,7 +193,8 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
               runSpacing: 8,
               children: widget.session.genres.map((genre) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(16),
@@ -221,7 +236,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Song Search (placeholder)
           TextField(
             decoration: InputDecoration(
@@ -235,7 +250,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Tip Amount
           Text(
             'Tip Amount',
@@ -250,9 +265,9 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                 child: Slider(
                   value: _tipAmount,
                   min: widget.session.minTipAmount,
-                  max: 20.0,
+                  max: 1000.0,
                   divisions: 19,
-                  label: '\$${_tipAmount.toStringAsFixed(2)}',
+                  label: 'KSH ${_tipAmount.toStringAsFixed(0)}',
                   onChanged: (value) {
                     setState(() {
                       _tipAmount = value;
@@ -261,13 +276,14 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '\$${_tipAmount.toStringAsFixed(2)}',
+                  'KSH ${_tipAmount.toStringAsFixed(0)}',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.onPrimaryContainer,
@@ -277,7 +293,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Message
           TextField(
             controller: _messageController,
@@ -292,14 +308,15 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Send Request Button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _sendRequest,
               icon: const Icon(Icons.send),
-              label: Text('Send Request (\$${_tipAmount.toStringAsFixed(2)})'),
+              label:
+                  Text('Send Request (KSH ${_tipAmount.toStringAsFixed(0)})'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
@@ -336,13 +353,19 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
           Row(
             children: [
               Expanded(
-                child: _buildStatItem(theme, 'Requests', '${widget.session.totalRequests}', Icons.queue_music),
+                child: _buildStatItem(theme, 'Requests',
+                    '${widget.session.totalRequests}', Icons.queue_music),
               ),
               Expanded(
-                child: _buildStatItem(theme, 'Accepted', '${widget.session.acceptedRequests}', Icons.check_circle),
+                child: _buildStatItem(theme, 'Accepted',
+                    '${widget.session.acceptedRequests}', Icons.check_circle),
               ),
               Expanded(
-                child: _buildStatItem(theme, 'Min Tip', '\$${widget.session.minTipAmount.toStringAsFixed(2)}', Icons.monetization_on),
+                child: _buildStatItem(
+                    theme,
+                    'Min Tip',
+                    'KSH ${widget.session.minTipAmount.toStringAsFixed(0)}',
+                    Icons.monetization_on),
               ),
             ],
           ),
@@ -351,7 +374,8 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
     );
   }
 
-  Widget _buildStatItem(ThemeData theme, String label, String value, IconData icon) {
+  Widget _buildStatItem(
+      ThemeData theme, String label, String value, IconData icon) {
     return Column(
       children: [
         Icon(
@@ -423,7 +447,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
-    
+
     if (hours > 0) {
       return '${hours}h ${minutes}m';
     } else {
@@ -432,12 +456,15 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   }
 
   void _sendRequest() async {
-    final listenerService = Provider.of<ListenerService>(context, listen: false);
-    
+    final listenerService =
+        Provider.of<ListenerService>(context, listen: false);
+
     final success = await listenerService.sendSongRequest(
       songId: 'sample_song_id', // In real app, would be selected song
       tipAmount: _tipAmount,
-      message: _messageController.text.trim().isEmpty ? null : _messageController.text.trim(),
+      message: _messageController.text.trim().isEmpty
+          ? null
+          : _messageController.text.trim(),
     );
 
     if (mounted) {
@@ -469,11 +496,202 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   }
 
   void _disconnectFromSession() async {
-    final listenerService = Provider.of<ListenerService>(context, listen: false);
+    final listenerService =
+        Provider.of<ListenerService>(context, listen: false);
     await listenerService.disconnectFromSession();
-    
+
     if (mounted) {
       Navigator.pop(context);
     }
+  }
+
+  Widget _buildSessionImage(ThemeData theme) {
+    return GestureDetector(
+      onTap: () => _showImageViewer(widget.session.imageUrl!),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            Image.network(
+              widget.session.imageUrl!,
+              width: double.infinity,
+              height: 200,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: double.infinity,
+                height: 200,
+                color: theme.colorScheme.surfaceVariant,
+                child: Icon(
+                  Icons.music_note,
+                  size: 64,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  width: double.infinity,
+                  height: 200,
+                  color: theme.colorScheme.surfaceVariant,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  ),
+                );
+              },
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.zoom_in,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showImageViewer(String imageUrl) {
+    if (!mounted) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => _ImageViewerScreen(imageUrl: imageUrl),
+      ),
+    );
+  }
+}
+
+/// Full-screen image viewer with pinch-to-zoom and pan gestures
+class _ImageViewerScreen extends StatefulWidget {
+  final String imageUrl;
+
+  const _ImageViewerScreen({required this.imageUrl});
+
+  @override
+  State<_ImageViewerScreen> createState() => _ImageViewerScreenState();
+}
+
+class _ImageViewerScreenState extends State<_ImageViewerScreen> {
+  final TransformationController _transformationController =
+      TransformationController();
+  TapDownDetails? _doubleTapDetails;
+
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    super.dispose();
+  }
+
+  void _handleDoubleTapDown(TapDownDetails details) {
+    _doubleTapDetails = details;
+  }
+
+  void _handleDoubleTap() {
+    if (_transformationController.value != Matrix4.identity()) {
+      // Reset zoom
+      _transformationController.value = Matrix4.identity();
+    } else {
+      // Zoom in to 2x at tap position
+      final position = _doubleTapDetails!.localPosition;
+      _transformationController.value = Matrix4.identity()
+        ..translate(-position.dx, -position.dy)
+        ..scale(2.0);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.zoom_in, color: Colors.white),
+            onPressed: () {
+              final currentScale =
+                  _transformationController.value.getMaxScaleOnAxis();
+              if (currentScale < 3.0) {
+                _transformationController.value = Matrix4.identity()
+                  ..scale(currentScale + 0.5);
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.zoom_out, color: Colors.white),
+            onPressed: () {
+              final currentScale =
+                  _transformationController.value.getMaxScaleOnAxis();
+              if (currentScale > 1.0) {
+                _transformationController.value = Matrix4.identity()
+                  ..scale(currentScale - 0.5);
+              }
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: GestureDetector(
+          onDoubleTapDown: _handleDoubleTapDown,
+          onDoubleTap: _handleDoubleTap,
+          child: InteractiveViewer(
+            transformationController: _transformationController,
+            minScale: 0.5,
+            maxScale: 4.0,
+            child: Image.network(
+              widget.imageUrl,
+              fit: BoxFit.contain,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                    color: Colors.white,
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) => const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.white, size: 64),
+                    SizedBox(height: 16),
+                    Text(
+                      'Failed to load image',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

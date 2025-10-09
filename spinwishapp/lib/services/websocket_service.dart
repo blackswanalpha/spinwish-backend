@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:spinwishapp/services/api_service.dart';
 import 'package:spinwishapp/models/session.dart';
 import 'package:spinwishapp/models/request.dart';
+import 'package:spinwishapp/models/tip.dart';
 
 class WebSocketService extends ChangeNotifier {
   static final WebSocketService _instance = WebSocketService._internal();
@@ -28,6 +27,8 @@ class WebSocketService extends ChangeNotifier {
       StreamController<Session>.broadcast();
   final StreamController<Request> _requestUpdateController =
       StreamController<Request>.broadcast();
+  final StreamController<Tip> _tipUpdateController =
+      StreamController<Tip>.broadcast();
   final StreamController<Map<String, dynamic>> _generalUpdateController =
       StreamController<Map<String, dynamic>>.broadcast();
 
@@ -35,6 +36,7 @@ class WebSocketService extends ChangeNotifier {
   bool get isConnected => _isConnected;
   Stream<Session> get sessionUpdates => _sessionUpdateController.stream;
   Stream<Request> get requestUpdates => _requestUpdateController.stream;
+  Stream<Tip> get tipUpdates => _tipUpdateController.stream;
   Stream<Map<String, dynamic>> get generalUpdates =>
       _generalUpdateController.stream;
 
@@ -51,12 +53,16 @@ class WebSocketService extends ChangeNotifier {
       // Get WebSocket URL based on API base URL
       final wsUrl = await _getWebSocketUrl();
 
-      _channel = IOWebSocketChannel.connect(
-        wsUrl,
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
+      // Use WebSocketChannel.connect for better platform compatibility
+      _channel = WebSocketChannel.connect(
+        Uri.parse(wsUrl),
       );
+
+      // Send authentication after connection
+      _channel!.sink.add(jsonEncode({
+        'type': 'auth',
+        'token': token,
+      }));
 
       _subscription = _channel!.stream.listen(
         _handleMessage,
@@ -144,6 +150,32 @@ class WebSocketService extends ChangeNotifier {
     _sendMessage(message);
   }
 
+  /// Subscribe to tip updates for a session
+  void subscribeToTips(String sessionId) {
+    if (!_isConnected) return;
+
+    final message = {
+      'type': 'subscribe',
+      'topic': 'tips',
+      'sessionId': sessionId,
+    };
+
+    _sendMessage(message);
+  }
+
+  /// Unsubscribe from tip updates
+  void unsubscribeFromTips(String sessionId) {
+    if (!_isConnected) return;
+
+    final message = {
+      'type': 'unsubscribe',
+      'topic': 'tips',
+      'sessionId': sessionId,
+    };
+
+    _sendMessage(message);
+  }
+
   /// Send a message through WebSocket
   void _sendMessage(Map<String, dynamic> message) {
     if (!_isConnected || _channel == null) return;
@@ -159,7 +191,6 @@ class WebSocketService extends ChangeNotifier {
   void _handleMessage(dynamic message) {
     try {
       final data = jsonDecode(message as String) as Map<String, dynamic>;
-      final type = data['type'] as String?;
       final topic = data['topic'] as String?;
 
       switch (topic) {
@@ -168,6 +199,9 @@ class WebSocketService extends ChangeNotifier {
           break;
         case 'requests':
           _handleRequestUpdate(data);
+          break;
+        case 'tips':
+          _handleTipUpdate(data);
           break;
         case 'heartbeat':
           _handleHeartbeat(data);
@@ -203,6 +237,19 @@ class WebSocketService extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Failed to handle request update: $e');
+    }
+  }
+
+  /// Handle tip update messages
+  void _handleTipUpdate(Map<String, dynamic> data) {
+    try {
+      final tipData = data['tip'] as Map<String, dynamic>?;
+      if (tipData != null) {
+        final tip = Tip.fromJson(tipData);
+        _tipUpdateController.add(tip);
+      }
+    } catch (e) {
+      debugPrint('Failed to handle tip update: $e');
     }
   }
 

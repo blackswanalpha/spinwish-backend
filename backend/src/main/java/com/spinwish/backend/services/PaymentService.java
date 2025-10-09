@@ -2,6 +2,7 @@ package com.spinwish.backend.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spinwish.backend.config.MpesaConfig;
+import com.spinwish.backend.entities.Request;
 import com.spinwish.backend.entities.payments.RequestsPayment;
 import com.spinwish.backend.entities.Users;
 import com.spinwish.backend.entities.payments.StkPushSession;
@@ -607,6 +608,76 @@ public class PaymentService {
 
             return paymentData;
         }).toList();
+    }
+
+    /**
+     * Save PayMe demo payment for a song request
+     */
+    @Transactional
+    public RequestsPayment savePaymeRequestPayment(String requestId, double amount, String transactionId) {
+        String emailAddress = SecurityContextHolder.getContext().getAuthentication().getName();
+        Users payer = userRepository.findByEmailAddress(emailAddress);
+
+        if (payer == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Find the request
+        Request request = requestRepository.findById(UUID.fromString(requestId))
+                .orElseThrow(() -> new RuntimeException("Request not found: " + requestId));
+
+        // Create and save the payment
+        RequestsPayment payment = new RequestsPayment();
+        payment.setReceiptNumber(transactionId);
+        payment.setPhoneNumber("PAYME-DEMO"); // Mark as PayMe demo payment
+        payment.setAmount(amount);
+        payment.setTransactionDate(LocalDateTime.now());
+        payment.setPayer(payer);
+        payment.setPayerName(payer.getActualUsername());
+        payment.setRequest(request);
+
+        RequestsPayment savedPayment = requestsPaymentRepository.save(payment);
+        paymentMetrics.recordPaymentCompleted("REQUEST", amount);
+        log.info("💾 Saved PayMe request payment for request ID {}", requestId);
+
+        return savedPayment;
+    }
+
+    /**
+     * Save PayMe demo payment for a tip
+     */
+    @Transactional
+    public TipPayments savePaymeTipPayment(String djId, double amount, String transactionId) {
+        String emailAddress = SecurityContextHolder.getContext().getAuthentication().getName();
+        Users payer = userRepository.findByEmailAddress(emailAddress);
+
+        if (payer == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Find the DJ
+        Users dj = userRepository.findById(UUID.fromString(djId))
+                .orElseThrow(() -> new RuntimeException("DJ not found: " + djId));
+
+        if (!"DJ".equals(dj.getRole().getRoleName())) {
+            throw new RuntimeException("User is not a DJ");
+        }
+
+        // Create and save the tip payment
+        TipPayments tip = new TipPayments();
+        tip.setReceiptNumber(transactionId);
+        tip.setPhoneNumber("PAYME-DEMO"); // Mark as PayMe demo payment
+        tip.setAmount(amount);
+        tip.setTransactionDate(LocalDateTime.now());
+        tip.setPayer(payer);
+        tip.setPayerName(payer.getActualUsername());
+        tip.setDj(dj);
+
+        TipPayments savedTip = tipPaymentsRepository.save(tip);
+        paymentMetrics.recordPaymentCompleted("TIP", amount);
+        log.info("💾 Saved PayMe tip payment for DJ ID {}", djId);
+
+        return savedTip;
     }
 
 }

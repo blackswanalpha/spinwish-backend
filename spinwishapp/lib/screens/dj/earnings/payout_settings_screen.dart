@@ -1,24 +1,8 @@
 import 'package:flutter/material.dart';
-
-enum PayoutMethod { bankAccount, paypal, stripe, crypto }
-
-class PayoutMethodData {
-  final String id;
-  final PayoutMethod method;
-  final String displayName;
-  final String details;
-  final bool isDefault;
-  final bool isVerified;
-
-  PayoutMethodData({
-    required this.id,
-    required this.method,
-    required this.displayName,
-    required this.details,
-    required this.isDefault,
-    required this.isVerified,
-  });
-}
+import 'package:spinwishapp/models/payout.dart';
+import 'package:spinwishapp/services/payout_api_service.dart';
+import 'package:spinwishapp/screens/dj/earnings/add_bank_account_screen.dart';
+import 'package:spinwishapp/screens/dj/earnings/add_mpesa_screen.dart';
 
 class PayoutSettingsScreen extends StatefulWidget {
   const PayoutSettingsScreen({super.key});
@@ -28,7 +12,7 @@ class PayoutSettingsScreen extends StatefulWidget {
 }
 
 class _PayoutSettingsScreenState extends State<PayoutSettingsScreen> {
-  List<PayoutMethodData> _payoutMethods = [];
+  List<PayoutMethodModel> _payoutMethods = [];
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -48,12 +32,10 @@ class _PayoutSettingsScreenState extends State<PayoutSettingsScreen> {
         _errorMessage = null;
       });
 
-      // TODO: Load payout methods from backend API
-      // For now, show empty state to indicate no mock data
-      await Future.delayed(const Duration(milliseconds: 500));
+      final methods = await PayoutApiService.getPayoutMethods();
 
       setState(() {
-        _payoutMethods = []; // No mock data - will show empty state
+        _payoutMethods = methods;
         _isLoading = false;
       });
     } catch (e) {
@@ -116,7 +98,7 @@ class _PayoutSettingsScreenState extends State<PayoutSettingsScreen> {
     );
   }
 
-  Widget _buildPayoutMethodCard(ThemeData theme, PayoutMethodData method) {
+  Widget _buildPayoutMethodCard(ThemeData theme, PayoutMethodModel method) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -131,13 +113,13 @@ class _PayoutSettingsScreenState extends State<PayoutSettingsScreen> {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: _getMethodColor(
-                      method.method,
+                      method.methodType,
                     ).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
-                    _getMethodIcon(method.method),
-                    color: _getMethodColor(method.method),
+                    _getMethodIcon(method.methodType),
+                    color: _getMethodColor(method.methodType),
                     size: 24,
                   ),
                 ),
@@ -207,14 +189,6 @@ class _PayoutSettingsScreenState extends State<PayoutSettingsScreen> {
                           contentPadding: EdgeInsets.zero,
                         ),
                       ),
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: ListTile(
-                        leading: Icon(Icons.edit),
-                        title: Text('Edit'),
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ),
                     const PopupMenuItem(
                       value: 'delete',
                       child: ListTile(
@@ -423,55 +397,49 @@ class _PayoutSettingsScreenState extends State<PayoutSettingsScreen> {
     );
   }
 
-  Color _getMethodColor(PayoutMethod method) {
+  Color _getMethodColor(PayoutMethodType method) {
     switch (method) {
-      case PayoutMethod.bankAccount:
+      case PayoutMethodType.bankAccount:
         return Colors.blue;
-      case PayoutMethod.paypal:
-        return Colors.indigo;
-      case PayoutMethod.stripe:
-        return Colors.purple;
-      case PayoutMethod.crypto:
-        return Colors.orange;
+      case PayoutMethodType.mpesa:
+        return Colors.green;
     }
   }
 
-  IconData _getMethodIcon(PayoutMethod method) {
+  IconData _getMethodIcon(PayoutMethodType method) {
     switch (method) {
-      case PayoutMethod.bankAccount:
+      case PayoutMethodType.bankAccount:
         return Icons.account_balance;
-      case PayoutMethod.paypal:
-        return Icons.payment;
-      case PayoutMethod.stripe:
-        return Icons.credit_card;
-      case PayoutMethod.crypto:
-        return Icons.currency_bitcoin;
+      case PayoutMethodType.mpesa:
+        return Icons.phone_android;
     }
   }
 
-  void _handlePayoutMethodAction(String action, PayoutMethodData method) {
+  Future<void> _handlePayoutMethodAction(
+      String action, PayoutMethodModel method) async {
     switch (action) {
       case 'set_default':
-        setState(() {
-          _payoutMethods = _payoutMethods
-              .map(
-                (m) => PayoutMethodData(
-                  id: m.id,
-                  method: m.method,
-                  displayName: m.displayName,
-                  details: m.details,
-                  isDefault: m.id == method.id,
-                  isVerified: m.isVerified,
-                ),
-              )
-              .toList();
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Default payout method updated')),
-        );
-        break;
-      case 'edit':
-        _showEditPayoutMethodDialog(method);
+        try {
+          await PayoutApiService.setDefaultPayoutMethod(method.id);
+          await _loadPayoutMethods();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${method.displayName} set as default'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to set default: ${e.toString()}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
         break;
       case 'delete':
         _showDeleteConfirmationDialog(method);
@@ -491,48 +459,43 @@ class _PayoutSettingsScreenState extends State<PayoutSettingsScreen> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Add payout method feature coming soon'),
+              final result = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const AddBankAccountScreen(),
                 ),
               );
+              if (result == true) {
+                _loadPayoutMethods();
+              }
             },
             child: const Text('Add Bank Account'),
           ),
-        ],
-      ),
-    );
-  }
-
-  void _showEditPayoutMethodDialog(PayoutMethodData method) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Payout Method'),
-        content: Text('Edit ${method.displayName}'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit feature coming soon')),
+              final result = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const AddMpesaScreen(),
+                ),
               );
+              if (result == true) {
+                _loadPayoutMethods();
+              }
             },
-            child: const Text('Save'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+            ),
+            child: const Text('Add M-Pesa'),
           ),
         ],
       ),
     );
   }
 
-  void _showDeleteConfirmationDialog(PayoutMethodData method) {
-    showDialog(
+  Future<void> _showDeleteConfirmationDialog(PayoutMethodModel method) async {
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Payout Method'),
@@ -541,24 +504,40 @@ class _PayoutSettingsScreenState extends State<PayoutSettingsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context, false),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _payoutMethods.removeWhere((m) => m.id == method.id);
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Payout method deleted')),
-              );
-            },
+            onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Delete'),
           ),
         ],
       ),
     );
+
+    if (confirmed == true) {
+      try {
+        await PayoutApiService.deletePayoutMethod(method.id);
+        await _loadPayoutMethods();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Payout method deleted'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 }

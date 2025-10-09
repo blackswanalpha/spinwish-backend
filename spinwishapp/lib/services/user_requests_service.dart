@@ -442,6 +442,41 @@ class UserRequestsService {
     }
   }
 
+  /// Get pending requests for a session (PENDING status only)
+  static Future<List<PlaySongResponse>> getPendingRequestsBySession(
+      String sessionId) async {
+    try {
+      debugPrint('⏳ Fetching pending requests for session: $sessionId');
+      debugPrint('⏳ API endpoint: $_baseEndpoint/session/$sessionId/pending');
+
+      final response = await ApiService.get(
+        '$_baseEndpoint/session/$sessionId/pending',
+        includeAuth: true,
+      );
+
+      debugPrint('⏳ Pending response status: ${response.statusCode}');
+      debugPrint('⏳ Pending response body: ${response.body}');
+
+      final data = ApiService.handleResponse(response);
+      debugPrint('⏳ Parsed pending data type: ${data.runtimeType}');
+
+      if (data is List) {
+        debugPrint('⏳ Pending data is a List with ${data.length} items');
+        final results = (data as List)
+            .map((json) => PlaySongResponse.fromJson(json))
+            .toList();
+        debugPrint('✅ Converted to ${results.length} pending requests');
+        return results;
+      }
+      debugPrint('⚠️ Pending data is not a List, returning empty');
+      return [];
+    } catch (e, stackTrace) {
+      debugPrint('❌ Error getting pending requests: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      throw ApiException('Failed to get pending requests: ${e.toString()}');
+    }
+  }
+
   /// Get session queue (accepted requests ordered by queue position)
   static Future<List<PlaySongResponse>> getSessionQueue(
       String sessionId) async {

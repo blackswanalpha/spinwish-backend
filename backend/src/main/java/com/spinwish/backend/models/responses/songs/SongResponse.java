@@ -19,6 +19,7 @@ public class SongResponse {
     private UUID artistId;
     private String artistName;
     private String artist; // For Flutter compatibility
+    private String spotifyUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

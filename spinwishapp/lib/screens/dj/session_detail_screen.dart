@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:spinwishapp/models/session.dart';
 import 'package:spinwishapp/services/session_api_service.dart';
 import 'package:spinwishapp/widgets/session_export_dialog.dart';
+import 'package:spinwishapp/screens/dj/live_session_screen.dart';
 
 class SessionDetailScreen extends StatelessWidget {
   final Session session;
@@ -232,7 +233,7 @@ class SessionDetailScreen extends StatelessWidget {
             _buildMetricCard(
               context,
               'Total Earnings',
-              '\$${earnings.toStringAsFixed(2)}',
+              'KSH ${earnings.toStringAsFixed(2)}',
               Icons.attach_money,
               Colors.green,
             ),
@@ -253,7 +254,7 @@ class SessionDetailScreen extends StatelessWidget {
             _buildMetricCard(
               context,
               'Tips',
-              '\$${(session.totalTips ?? 0.0).toStringAsFixed(2)}',
+              'KSH ${(session.totalTips ?? 0.0).toStringAsFixed(2)}',
               Icons.favorite,
               Colors.red,
             ),
@@ -428,9 +429,35 @@ class SessionDetailScreen extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // Live Session Button (show for LIVE or PREPARING sessions)
+        if (session.status == SessionStatus.live ||
+            session.status == SessionStatus.preparing) ...[
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LiveSessionScreen(session: session),
+                ),
+              );
+            },
+            icon: const Icon(Icons.live_tv),
+            label: const Text('View Live Session'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              elevation: 4,
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+
         // Stop Session Button (only show for LIVE sessions)
         if (session.status == SessionStatus.live) ...[
           ElevatedButton.icon(

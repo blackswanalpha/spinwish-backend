@@ -86,10 +86,23 @@ public class PaymentController {
             String pin = (String) request.get("pin");
             Double amount = ((Number) request.get("amount")).doubleValue();
             String requestId = (String) request.get("requestId");
-            String djName = (String) request.get("djName");
+            String djId = (String) request.get("djId");
 
             // Generate demo transaction ID
             String transactionId = "PAYME" + System.currentTimeMillis();
+
+            // Save the payment to database
+            if (requestId != null && !requestId.trim().isEmpty()) {
+                // This is a song request payment
+                paymentService.savePaymeRequestPayment(requestId, amount, transactionId);
+                log.info("💾 PayMe request payment saved: {} for request {}", transactionId, requestId);
+            } else if (djId != null && !djId.trim().isEmpty()) {
+                // This is a tip payment
+                paymentService.savePaymeTipPayment(djId, amount, transactionId);
+                log.info("💾 PayMe tip payment saved: {} for DJ {}", transactionId, djId);
+            } else {
+                log.warn("⚠️ PayMe payment initiated but no requestId or djId provided");
+            }
 
             Map<String, Object> response = Map.of(
                 "isSuccess", true,

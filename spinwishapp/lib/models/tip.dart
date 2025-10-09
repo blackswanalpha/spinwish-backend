@@ -106,16 +106,16 @@ class TipPreset {
     this.emoji,
   });
 
-  String get formattedAmount => '\$${amount.toStringAsFixed(0)}';
+  String get formattedAmount => 'KSH ${amount.toStringAsFixed(0)}';
 }
 
-// Common tip presets
+// Common tip presets (in Kenyan Shillings)
 class TipPresets {
   static const List<TipPreset> common = [
-    TipPreset(amount: 5.0, label: 'Small Tip', emoji: '☕'),
-    TipPreset(amount: 10.0, label: 'Good Vibes', emoji: '🎵'),
-    TipPreset(amount: 20.0, label: 'Great Set', emoji: '🔥'),
-    TipPreset(amount: 50.0, label: 'Amazing!', emoji: '⭐'),
-    TipPreset(amount: 100.0, label: 'Legendary', emoji: '👑'),
+    TipPreset(amount: 50.0, label: 'Small Tip', emoji: '☕'),
+    TipPreset(amount: 100.0, label: 'Good Vibes', emoji: '🎵'),
+    TipPreset(amount: 200.0, label: 'Great Set', emoji: '🔥'),
+    TipPreset(amount: 500.0, label: 'Amazing!', emoji: '⭐'),
+    TipPreset(amount: 1000.0, label: 'Legendary', emoji: '👑'),
   ];
 }

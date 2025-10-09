@@ -1,6 +1,7 @@
 package com.spinwish.backend.repositories;
 
 import com.spinwish.backend.entities.payments.RequestsPayment;
+import com.spinwish.backend.entities.Request;
 import com.spinwish.backend.entities.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,9 @@ public interface RequestsPaymentRepository extends JpaRepository<RequestsPayment
 
     @Query("SELECT rp FROM RequestsPayment rp WHERE rp.request.dj = :dj AND rp.transactionDate BETWEEN :startDate AND :endDate")
     List<RequestsPayment> findByRequestDjAndTransactionDateBetween(@Param("dj") Users dj, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT rp FROM RequestsPayment rp WHERE rp.request.dj = :dj AND rp.request.status = :status AND rp.transactionDate BETWEEN :startDate AND :endDate")
+    List<RequestsPayment> findByRequestDjAndStatusAndTransactionDateBetween(@Param("dj") Users dj, @Param("status") Request.RequestStatus status, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT rp FROM RequestsPayment rp WHERE rp.request.dj = :dj")
     Page<RequestsPayment> findByRequestDj(@Param("dj") Users dj, Pageable pageable);

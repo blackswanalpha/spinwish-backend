@@ -39,6 +39,12 @@ public class RequestsService {
     @Autowired
     private RequestWebSocketBroadcaster broadcaster;
 
+    @Autowired
+    private RefundService refundService;
+
+    @Autowired
+    private SessionService sessionService;
+
     @Transactional
     public PlaySongResponse createRequest(PlaySongRequest playSongRequest) {
         // Extract email from authenticated user (client)
@@ -115,10 +121,15 @@ public class RequestsService {
         request.setDj(dj);
         request.setClient(client);
 
-        requestsRepository.save(request);
-        log.info("💾 Request saved to database with ID: {}, sessionId: {}", request.getId(), request.getSessionId());
+        Request savedRequest = requestsRepository.save(request);
+        log.info("💾 Request saved to database with ID: {}, sessionId: {}", savedRequest.getId(), savedRequest.getSessionId());
 
-        PlaySongResponse response = convertPlayRequest(request);
+        // Update session statistics
+        if (savedRequest.getSessionId() != null) {
+            sessionService.updateSessionOnRequestCreated(savedRequest.getSessionId());
+        }
+
+        PlaySongResponse response = convertPlayRequest(savedRequest);
         broadcaster.broadcastRequestUpdate(response);
         return response;
     }
@@ -217,10 +228,23 @@ public class RequestsService {
             throw new RuntimeException("Unauthorized: You can only accept requests for your own sessions");
         }
 
+        // Update request status to ACCEPTED
         request.setStatus(Request.RequestStatus.ACCEPTED);
         request.setUpdatedAt(LocalDateTime.now());
 
         requestsRepository.save(request);
+
+        // Update session statistics
+        if (request.getSessionId() != null) {
+            sessionService.updateSessionOnRequestAccepted(request.getSessionId(), request.getAmount());
+        }
+
+        // Payment is automatically captured when request is accepted
+        // The payment was already processed when the request was created
+        // No additional action needed - earnings will be calculated from ACCEPTED requests
+        log.info("✅ Request {} accepted by DJ {}. Payment captured for amount: KSH {}",
+                 requestId, currentDJ.getActualUsername(), request.getAmount());
+
         PlaySongResponse response = convertPlayRequest(request);
         broadcaster.broadcastRequestUpdate(response);
 
@@ -239,10 +263,28 @@ public class RequestsService {
             throw new RuntimeException("Unauthorized: You can only reject requests for your own sessions");
         }
 
+        // Update request status to REJECTED
         request.setStatus(Request.RequestStatus.REJECTED);
         request.setUpdatedAt(LocalDateTime.now());
 
         requestsRepository.save(request);
+
+        // Update session statistics
+        if (request.getSessionId() != null) {
+            sessionService.updateSessionOnRequestRejected(request.getSessionId());
+        }
+
+        // Process automatic refund for rejected request
+        log.info("🔄 Processing refund for rejected request ID: {}", requestId);
+        boolean refundSuccess = refundService.processRefundForRejectedRequest(request);
+
+        if (refundSuccess) {
+            log.info("✅ Refund processed successfully for request {} - Amount: KSH {}",
+                     requestId, request.getAmount());
+        } else {
+            log.warn("⚠️ Refund processing failed or no payment found for request {}", requestId);
+        }
+
         PlaySongResponse response = convertPlayRequest(request);
         broadcaster.broadcastRequestUpdate(response);
 
@@ -505,6 +547,25 @@ public class RequestsService {
         }
 
         return requests.stream()
+                .map(this::convertPlayRequest)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get pending requests for a session (PENDING status only)
+     */
+    public List<PlaySongResponse> getPendingRequestsBySessionId(UUID sessionId) {
+        log.info("⏳ Fetching pending requests for session: {}", sessionId);
+        List<Request> requests = requestsRepository.findBySessionIdOrderByCreatedAtDesc(sessionId);
+
+        // Filter for PENDING status only
+        List<Request> pendingRequests = requests.stream()
+                .filter(r -> r.getStatus() == Request.RequestStatus.PENDING)
+                .collect(Collectors.toList());
+
+        log.info("⏳ Found {} pending requests for session {}", pendingRequests.size(), sessionId);
+
+        return pendingRequests.stream()
                 .map(this::convertPlayRequest)
                 .collect(Collectors.toList());
     }

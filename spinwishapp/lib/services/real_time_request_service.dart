@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:spinwishapp/models/request.dart';
-import 'package:spinwishapp/models/play_song_response.dart';
+import 'package:spinwishapp/models/request.dart' as request_model;
 import 'package:spinwishapp/services/websocket_service.dart';
 import 'package:spinwishapp/services/user_requests_service.dart';
 import 'package:spinwishapp/services/auth_service.dart';
@@ -69,7 +68,7 @@ class RealTimeRequestService extends ChangeNotifier {
   }
 
   /// Handle real-time request updates from WebSocket
-  void _handleRealTimeRequestUpdate(Request request) {
+  void _handleRealTimeRequestUpdate(request_model.Request request) {
     // Convert Request to PlaySongResponse format
     final playSongResponse = _convertRequestToPlaySongResponse(request);
 
@@ -86,13 +85,14 @@ class RealTimeRequestService extends ChangeNotifier {
   }
 
   /// Convert Request model to PlaySongResponse format
-  PlaySongResponse _convertRequestToPlaySongResponse(Request request) {
+  PlaySongResponse _convertRequestToPlaySongResponse(
+      request_model.Request request) {
     return PlaySongResponse(
       id: request.id,
       djName: '', // Not available in Request model
       clientName: '', // Not available in Request model
-      status: request.status == RequestStatus.ACCEPTED ||
-          request.status == RequestStatus.PLAYED,
+      status: request.status == request_model.RequestStatus.accepted ||
+          request.status == request_model.RequestStatus.played,
       createdAt: request.timestamp, // Using timestamp as createdAt
       updatedAt: null, // Not available in Request model
       songResponse: null, // Not available in Request model

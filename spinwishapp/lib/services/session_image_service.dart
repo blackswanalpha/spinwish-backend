@@ -1,16 +1,17 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:spinwishapp/services/api_service.dart';
 import 'package:spinwishapp/models/session.dart';
 import 'dart:convert';
 
 class SessionImageService {
-  static const String _sessionEndpoint = '/api/v1/sessions';
+  static const String _sessionEndpoint = '/sessions';
 
-  /// Upload an image for a session
+  /// Upload an image for a session from XFile (works on all platforms)
   /// Returns the updated Session object with the new image URL
-  static Future<Session> uploadSessionImage(
-      String sessionId, File imageFile) async {
+  static Future<Session> uploadSessionImageFromXFile(
+      String sessionId, XFile imageFile) async {
     try {
       final baseUrl = await ApiService.getBaseUrl();
       final request = http.MultipartRequest(
@@ -24,10 +25,23 @@ class SessionImageService {
         request.headers['Authorization'] = 'Bearer $token';
       }
 
-      // Add the image file
-      request.files.add(
-        await http.MultipartFile.fromPath('image', imageFile.path),
-      );
+      // Add the image file - works on all platforms
+      if (kIsWeb) {
+        // For web, read bytes directly
+        final bytes = await imageFile.readAsBytes();
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'image',
+            bytes,
+            filename: imageFile.name,
+          ),
+        );
+      } else {
+        // For mobile/desktop, use path
+        request.files.add(
+          await http.MultipartFile.fromPath('image', imageFile.path),
+        );
+      }
 
       // Send the request
       final streamedResponse = await request.send();
@@ -37,14 +51,18 @@ class SessionImageService {
         try {
           final jsonResponse = jsonDecode(response.body);
 
-          // Debug: Print response to understand structure
-          print('Upload response: $jsonResponse');
+          // Debug: Log response to understand structure
+          if (kDebugMode) {
+            print('Upload response: $jsonResponse');
+          }
 
           // Try to parse the session
           return Session.fromApiResponse(jsonResponse);
         } catch (parseError) {
-          print('Parse error: $parseError');
-          print('Response body: ${response.body}');
+          if (kDebugMode) {
+            print('Parse error: $parseError');
+            print('Response body: ${response.body}');
+          }
           throw Exception(
               'Failed to parse session response: ${parseError.toString()}');
         }
@@ -53,7 +71,9 @@ class SessionImageService {
             'Failed to upload session image: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      print('Upload error: $e');
+      if (kDebugMode) {
+        print('Upload error: $e');
+      }
       throw Exception('Failed to upload session image: ${e.toString()}');
     }
   }
@@ -108,23 +128,18 @@ class SessionImageService {
     return '$baseUrl$imageUrl';
   }
 
-  /// Validate image file before upload
+  /// Validate image file before upload (works on all platforms)
   /// Returns true if valid, throws exception if invalid
-  static bool validateImageFile(File imageFile) {
-    // Check if file exists
-    if (!imageFile.existsSync()) {
-      throw Exception('Image file does not exist');
-    }
-
+  static Future<bool> validateImageFile(XFile imageFile) async {
     // Check file size (max 10MB)
-    final fileSize = imageFile.lengthSync();
+    final fileSize = await imageFile.length();
     const maxSize = 10 * 1024 * 1024; // 10MB in bytes
     if (fileSize > maxSize) {
       throw Exception('Image file size exceeds 10MB limit');
     }
 
     // Check file extension
-    final fileName = imageFile.path.toLowerCase();
+    final fileName = imageFile.name.toLowerCase();
     final validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
     final hasValidExtension =
         validExtensions.any((ext) => fileName.endsWith(ext));

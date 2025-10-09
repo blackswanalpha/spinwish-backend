@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'api_service.dart';
 
 /// PayMe Service for handling demo payments
 class PaymeService {
-  static const String _baseEndpoint = '/api/v1/payment';
+  static const String _baseEndpoint = '/payment';
 
   /// Initiate a demo PayMe payment
   static Future<PaymePaymentResponse> initiateDemoPayment({
@@ -11,29 +14,73 @@ class PaymeService {
     required String pin,
     required double amount,
     String? requestId,
-    String? djName,
+    String? djId,
   }) async {
     try {
       // Validate inputs
       _validatePaymentInputs(accountNumber, pin, amount);
 
-      // Simulate API call delay
-      await Future.delayed(const Duration(milliseconds: 800));
+      // Get base URL
+      final baseUrl = await ApiService.getBaseUrl();
+      final url = Uri.parse('$baseUrl$_baseEndpoint/payme/demo');
 
-      // Generate a demo transaction ID
-      final transactionId = 'PAYME${DateTime.now().millisecondsSinceEpoch}';
+      debugPrint('🔵 Initiating PayMe payment to: $url');
+      debugPrint('   Amount: KSH $amount');
+      debugPrint('   RequestId: $requestId');
+      debugPrint('   DjId: $djId');
 
-      debugPrint('PayMe demo payment initiated: $transactionId');
+      // Get auth token
+      final token = await ApiService.getToken();
 
-      return PaymePaymentResponse(
-        isSuccess: true,
-        transactionId: transactionId,
-        message: 'Payment initiated successfully',
-        accountNumber: accountNumber,
-        amount: amount,
+      // Call backend API to record the payment
+      final response = await http
+          .post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'accountNumber': accountNumber,
+          'pin': pin,
+          'amount': amount,
+          if (requestId != null) 'requestId': requestId,
+          if (djId != null) 'djId': djId,
+        }),
+      )
+          .timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw PaymeException('Request timeout. Please try again.');
+        },
       );
+
+      debugPrint('📥 PayMe API response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+        if (data['isSuccess'] == true) {
+          debugPrint('✅ PayMe payment recorded in backend');
+
+          return PaymePaymentResponse(
+            isSuccess: true,
+            transactionId: data['transactionId'] as String,
+            message:
+                data['message'] as String? ?? 'Payment initiated successfully',
+            accountNumber: accountNumber,
+            amount: amount,
+          );
+        } else {
+          throw PaymeException(data['message'] as String? ?? 'Payment failed');
+        }
+      } else {
+        debugPrint(
+            '❌ PayMe API error: ${response.statusCode} - ${response.body}');
+        throw PaymeException('Payment failed. Please try again.');
+      }
     } catch (e) {
-      debugPrint('PayMe payment failed: $e');
+      debugPrint('❌ PayMe payment failed: $e');
       if (e is PaymeException) {
         rethrow;
       }
@@ -50,8 +97,7 @@ class PaymeService {
     }
 
     if (accountNumber.length < 4) {
-      throw const PaymeException(
-          'Please enter a valid PayMe account number');
+      throw const PaymeException('Please enter a valid PayMe account number');
     }
 
     // Validate PIN
@@ -177,4 +223,3 @@ class PaymeException implements Exception {
   @override
   String toString() => 'PaymeException: $message';
 }
-

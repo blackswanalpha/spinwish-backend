@@ -1,11 +1,13 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:spinwishapp/services/session_service.dart';
 import 'package:spinwishapp/services/session_image_service.dart';
 import 'package:spinwishapp/models/session.dart';
 import 'package:spinwishapp/utils/error_handler.dart';
+import 'package:spinwishapp/screens/dj/live_session_screen.dart';
 
 class CreateSessionScreen extends StatefulWidget {
   const CreateSessionScreen({super.key});
@@ -27,8 +29,8 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
   double _minTipAmount = 5.0;
   bool _isLoading = false;
 
-  // Image picker
-  File? _selectedImage;
+  // Image picker - using XFile for cross-platform compatibility
+  XFile? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
   final List<String> _availableGenres = [
@@ -288,11 +290,30 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.file(
-                          _selectedImage!,
-                          width: double.infinity,
-                          height: double.infinity,
-                          fit: BoxFit.cover,
+                        child: FutureBuilder<Uint8List>(
+                          future: _selectedImage!.readAsBytes(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return Image.memory(
+                                snapshot.data!,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                              );
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                  size: 48,
+                                ),
+                              );
+                            } else {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                          },
                         ),
                       ),
                       Positioned(
@@ -355,13 +376,11 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
       );
 
       if (image != null) {
-        final imageFile = File(image.path);
-
         // Validate image file
         try {
-          SessionImageService.validateImageFile(imageFile);
+          await SessionImageService.validateImageFile(image);
           setState(() {
-            _selectedImage = imageFile;
+            _selectedImage = image;
           });
         } catch (e) {
           if (mounted) {
@@ -511,7 +530,7 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
               ),
             ),
             Text(
-              '\$${_minTipAmount.toStringAsFixed(0)}',
+              'KSh ${_minTipAmount.toStringAsFixed(0)}',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.primary,
@@ -606,7 +625,7 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
       // Upload image if selected
       if (_selectedImage != null) {
         try {
-          await SessionImageService.uploadSessionImage(
+          await SessionImageService.uploadSessionImageFromXFile(
             session.id,
             _selectedImage!,
           );
@@ -626,7 +645,13 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
       }
 
       if (mounted) {
-        Navigator.of(context).pop();
+        // Navigate to LiveSessionScreen instead of just popping back
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => LiveSessionScreen(session: session),
+          ),
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(

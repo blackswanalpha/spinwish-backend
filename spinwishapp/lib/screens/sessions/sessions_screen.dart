@@ -414,7 +414,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                 const SizedBox(height: SpinWishDesignSystem.spaceMD),
 
                 // Session Description
-                if (session.description?.isNotEmpty == true)
+                if (session.description?.isNotEmpty == true) ...[
                   Text(
                     session.description!,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -423,11 +423,76 @@ class _SessionsScreenState extends State<SessionsScreen> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(height: SpinWishDesignSystem.spaceMD),
+                ],
+
+                // Session Metrics Row
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildMetricItem(
+                        theme,
+                        Icons.queue_music,
+                        '${session.totalRequests ?? 0}',
+                        'Requests',
+                      ),
+                      Container(
+                        width: 1,
+                        height: 30,
+                        color: theme.colorScheme.outline.withOpacity(0.2),
+                      ),
+                      _buildMetricItem(
+                        theme,
+                        Icons.monetization_on,
+                        'KSH ${(session.totalEarnings ?? 0.0).toStringAsFixed(0)}',
+                        'Earnings',
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMetricItem(
+    ThemeData theme,
+    IconData icon,
+    String value,
+    String label,
+  ) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          size: 20,
+          color: theme.colorScheme.primary,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.6),
+          ),
+        ),
+      ],
     );
   }
 
@@ -650,6 +715,40 @@ class _SessionsScreenState extends State<SessionsScreen> {
                     }).toList(),
                   ),
                 ],
+
+                const SizedBox(height: SpinWishDesignSystem.spaceMD),
+
+                // Session Metrics Row
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildMetricItem(
+                        theme,
+                        Icons.queue_music,
+                        '${djSession.totalRequests}',
+                        'Requests',
+                      ),
+                      Container(
+                        width: 1,
+                        height: 30,
+                        color: theme.colorScheme.outline.withOpacity(0.2),
+                      ),
+                      _buildMetricItem(
+                        theme,
+                        Icons.monetization_on,
+                        'KSH ${djSession.totalEarnings.toStringAsFixed(0)}',
+                        'Earnings',
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

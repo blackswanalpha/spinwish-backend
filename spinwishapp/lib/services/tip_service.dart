@@ -63,7 +63,7 @@ class TipService {
         userId: userId,
         djId: '1',
         sessionId: '1',
-        amount: 10.0,
+        amount: 200.0,
         message: 'Great set! 🔥',
         status: TipStatus.completed,
         timestamp: DateTime.now().subtract(const Duration(hours: 2)),
@@ -75,7 +75,7 @@ class TipService {
         userId: userId,
         djId: '2',
         sessionId: '2',
-        amount: 5.0,
+        amount: 100.0,
         status: TipStatus.completed,
         timestamp: DateTime.now().subtract(const Duration(days: 1)),
         paymentId: 'pay_tip_002',
@@ -95,7 +95,7 @@ class TipService {
         userId: 'user1',
         djId: djId,
         sessionId: '1',
-        amount: 20.0,
+        amount: 500.0,
         message: 'Amazing music selection!',
         status: TipStatus.completed,
         timestamp: DateTime.now().subtract(const Duration(minutes: 30)),
@@ -107,7 +107,7 @@ class TipService {
         userId: 'user2',
         djId: djId,
         sessionId: '1',
-        amount: 15.0,
+        amount: 200.0,
         status: TipStatus.completed,
         timestamp: DateTime.now().subtract(const Duration(hours: 1)),
         paymentId: 'pay_tip_004',
@@ -122,7 +122,7 @@ class TipService {
     await Future.delayed(const Duration(milliseconds: 300));
 
     // In a real app, this would sum all tips for the session
-    return 85.50;
+    return 1850.0;
   }
 
   /// Get tip statistics for a DJ
@@ -131,21 +131,21 @@ class TipService {
     await Future.delayed(const Duration(milliseconds: 500));
 
     return TipStatistics(
-      totalTips: 245.75,
+      totalTips: 8500.0,
       tipCount: 18,
-      averageTip: 13.65,
-      topTip: 50.0,
-      thisWeekTips: 89.25,
-      thisMonthTips: 245.75,
+      averageTip: 472.22,
+      topTip: 1000.0,
+      thisWeekTips: 3200.0,
+      thisMonthTips: 8500.0,
     );
   }
 
-  /// Validate tip amount
+  /// Validate tip amount (in KSH)
   static bool isValidTipAmount(double amount) {
-    return amount >= 1.0 && amount <= 200.0;
+    return amount >= 10.0 && amount <= 10000.0;
   }
 
-  /// Get suggested tip amounts based on context
+  /// Get suggested tip amounts based on context (in KSH)
   static List<TipPreset> getSuggestedTips({
     double? averageSessionTip,
     String? djRating,
@@ -154,14 +154,14 @@ class TipService {
     List<TipPreset> suggestions = List.from(TipPresets.common);
 
     // Adjust based on context
-    if (averageSessionTip != null && averageSessionTip > 15.0) {
+    if (averageSessionTip != null && averageSessionTip > 300.0) {
       // Higher average tips in this session, suggest higher amounts
       suggestions = [
-        const TipPreset(amount: 10.0, label: 'Good Vibes', emoji: '🎵'),
-        const TipPreset(amount: 20.0, label: 'Great Set', emoji: '🔥'),
-        const TipPreset(amount: 35.0, label: 'Amazing!', emoji: '⭐'),
-        const TipPreset(amount: 50.0, label: 'Incredible', emoji: '👑'),
-        const TipPreset(amount: 100.0, label: 'Legendary', emoji: '💎'),
+        const TipPreset(amount: 200.0, label: 'Good Vibes', emoji: '🎵'),
+        const TipPreset(amount: 500.0, label: 'Great Set', emoji: '🔥'),
+        const TipPreset(amount: 1000.0, label: 'Amazing!', emoji: '⭐'),
+        const TipPreset(amount: 2000.0, label: 'Incredible', emoji: '👑'),
+        const TipPreset(amount: 5000.0, label: 'Legendary', emoji: '💎'),
       ];
     }
 

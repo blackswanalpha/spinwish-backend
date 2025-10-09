@@ -90,6 +90,7 @@ public class SongService {
         response.setPopularity(song.getPopularity());
         response.setIsExplicit(song.getIsExplicit());
         response.setArtistId(song.getArtistId());
+        response.setSpotifyUrl(song.getSpotifyUrl());
 
         // Set artist name from relationship if available
         if (song.getArtist() != null) {

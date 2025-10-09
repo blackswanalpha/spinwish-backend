@@ -31,11 +31,11 @@ class _TipDJScreenState extends State<TipDJScreen> {
   bool isCustomAmount = false;
 
   final List<TipPreset> tipPresets = [
-    const TipPreset(amount: 5.0, label: 'Coffee', emoji: '☕'),
-    const TipPreset(amount: 10.0, label: 'Good Vibes', emoji: '🎵'),
-    const TipPreset(amount: 20.0, label: 'Great Set', emoji: '🔥'),
-    const TipPreset(amount: 50.0, label: 'Amazing!', emoji: '⭐'),
-    const TipPreset(amount: 100.0, label: 'Legendary', emoji: '👑'),
+    const TipPreset(amount: 50.0, label: 'Small Tip', emoji: '☕'),
+    const TipPreset(amount: 100.0, label: 'Good Vibes', emoji: '🎵'),
+    const TipPreset(amount: 200.0, label: 'Great Set', emoji: '🔥'),
+    const TipPreset(amount: 500.0, label: 'Amazing!', emoji: '⭐'),
+    const TipPreset(amount: 1000.0, label: 'Legendary', emoji: '👑'),
   ];
 
   @override
@@ -505,7 +505,7 @@ class _TipDJScreenState extends State<TipDJScreen> {
                   ),
                   child: Text(
                     selectedAmount != null
-                        ? 'Send Tip (\$${selectedAmount!.toStringAsFixed(2)})'
+                        ? 'Send Tip (KSH ${selectedAmount!.toStringAsFixed(2)})'
                         : 'Select Amount to Continue',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,

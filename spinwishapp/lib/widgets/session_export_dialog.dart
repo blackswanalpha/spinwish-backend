@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:spinwishapp/models/session.dart';
 import 'package:spinwishapp/services/session_export_service.dart';
+import 'package:spinwishapp/screens/dj/live_session_screen.dart';
 
 class SessionExportDialog extends StatefulWidget {
   final List<Session> sessions;
@@ -299,6 +300,34 @@ class SessionShareDialog extends StatelessWidget {
           ),
 
           const SizedBox(height: 20),
+
+          // View Live Session Button (only for LIVE or PREPARING sessions)
+          if (session.status == SessionStatus.live ||
+              session.status == SessionStatus.preparing) ...[
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog first
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LiveSessionScreen(session: session),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.live_tv),
+                label: const Text('View Live Session'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  elevation: 4,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
 
           // Share options
           Text(
